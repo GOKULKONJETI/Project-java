@@ -1,0 +1,278 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+class Patient {
+    private String name;
+    private int age;
+    private String diagnosis;
+
+    public Patient(String name, int age, String diagnosis) {
+        this.name = name;
+        this.age = age;
+        this.diagnosis = diagnosis;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public String getDiagnosis() {
+        return diagnosis;
+    }
+}
+
+public class HospitalManagementSystem {
+    private ArrayList<Patient> patients;
+    private int availableBeds;
+    private Map<String, String> medicineMap;
+    private Scanner scanner;
+
+    public HospitalManagementSystem() {
+        patients = new ArrayList<>();
+        availableBeds = 50; // Initial number of available beds
+        medicineMap = createMedicineMap();
+        scanner = new Scanner(System.in);
+    }
+
+    private Map<String, String> createMedicineMap() {
+        Map<String, String> medicineMap = new HashMap<>();
+        medicineMap.put("Fever", "Paracetamol");
+        medicineMap.put("Cold", "Ibuprofen");
+        medicineMap.put("Headache", "Aspirin");
+        medicineMap.put("Cough", "Robitussin");
+        medicineMap.put("Stomachache", "Pepto-Bismol");
+        medicineMap.put("Allergy", "Claritin");
+        medicineMap.put("Insomnia", "Melatonin");
+        medicineMap.put("High Blood Pressure", "Lisinopril");
+        medicineMap.put("Diabetes", "Metformin");
+        medicineMap.put("Joint Pain", "Icy Hot");
+        // Add more medicine suggestions as needed	
+        return medicineMap;
+    }
+
+    public void managePatients() {
+        boolean exit = false;
+        while (!exit) {
+            System.out.println("\nHospital Management System Menu:");
+            System.out.println("1. Add Patient");
+            System.out.println("2. View Patients");
+            System.out.println("3. Search Patient by Name");
+            System.out.println("4. Display Statistics");
+            System.out.println("5. Check Available Beds");
+            System.out.println("6. Suggest Medicine");
+            System.out.println("7. Update Patient Information");
+            System.out.println("8. Remove Patient");
+            System.out.println("9. Available Medicines");
+            System.out.println("10. Add Medicine");
+            System.out.println("11. Exit");
+            System.out.println("Enter your choice:");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline character
+
+            switch (choice) {
+                case 1:
+                    addPatient();
+                    break;
+                case 2:
+                    viewPatients();
+                    break;
+                case 3:
+                    searchPatientByName();
+                    break;
+                case 4:
+                    displayStatistics();
+                    break;
+                case 5:
+                    checkAvailableBeds();
+                    break;
+                case 6:
+                    suggestMedicine();
+                    break;
+                case 7:
+                    updatePatientInformation();
+                    break;
+                case 8:
+                    removePatient();
+                    break;
+                case 9:
+                    displayAvailableMedicines();
+                    break;
+                case 10:
+                    addMedicine();
+                    break;
+                case 11:
+                    System.out.println("Are you sure you want to exit? (yes/no)");
+                    exit = askYesNo();
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please enter a valid option.");
+            }
+        }
+    }
+
+    private void addPatient() {
+        System.out.println("Enter patient name:");
+        String name = scanner.nextLine();
+
+        // Check if the patient name already exists
+        for (Patient patient : patients) {
+            if (patient.getName().equalsIgnoreCase(name)) {
+                System.out.println("Patient with the same name already exists. Enter a different name.");
+                return; // Return without adding the patient
+            }
+        }
+
+        System.out.println("Enter patient age:");
+        int age = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline character
+
+        System.out.println("Enter patient diagnosis:");
+
+        String diagnosis = scanner.nextLine();
+
+        if (availableBeds > 0) {
+            Patient patient = new Patient(name, age, diagnosis);
+            patients.add(patient);
+            availableBeds--;
+
+            System.out.println("Patient added successfully!");
+        } else {
+            System.out.println("No available beds. Patient not added.");
+        }
+    }
+
+    private void viewPatients() {
+        System.out.println("List of Patients:");
+        for (Patient patient : patients) {
+            System.out.println("Name: " + patient.getName() +
+                    ", Age: " + patient.getAge() +
+                    ", Diagnosis: " + patient.getDiagnosis());
+        }
+    }
+
+    private void searchPatientByName() {
+        System.out.println("Enter patient name to search:");
+        String searchName = scanner.nextLine();
+
+        boolean found = false;
+        for (Patient patient : patients) {
+            if (patient.getName().equalsIgnoreCase(searchName)) {
+                System.out.println("Patient found:");
+                System.out.println("Name: " + patient.getName() +
+                        ", Age: " + patient.getAge() +
+                        ", Diagnosis: " + patient.getDiagnosis());
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("Patient not found with the given name.");
+        }
+    }
+
+    private void displayStatistics() {
+        System.out.println("Hospital Statistics:");
+        System.out.println("Total number of patients: " + patients.size());
+        System.out.println("Number of available beds: " + availableBeds);
+    }
+
+    private void checkAvailableBeds() {
+        System.out.println("Number of available beds: " + availableBeds);
+    }
+
+    private void suggestMedicine() {
+        System.out.println("Enter patient diagnosis to get medicine suggestion:");
+        String diagnosis = scanner.nextLine();
+
+        String medicine = medicineMap.get(diagnosis);
+        if (medicine != null) {
+            System.out.println("Suggested Medicine for " + diagnosis + ": " + medicine);
+        } else {
+            System.out.println("No specific medicine suggestion for the given diagnosis.");
+        }
+    }
+
+    private void updatePatientInformation() {
+        System.out.println("Enter patient name to update information:");
+        String searchName = scanner.nextLine();
+
+        boolean found = false;
+        for (int i = 0; i < patients.size(); i++) {
+            Patient patient = patients.get(i);
+            if (patient.getName().equalsIgnoreCase(searchName)) {
+                System.out.println("Enter updated age:");
+                int updatedAge = scanner.nextInt();
+                scanner.nextLine(); // Consume the newline character
+
+                System.out.println("Enter updated diagnosis:");
+                String updatedDiagnosis = scanner.nextLine();
+
+                // Update the patient directly in the list
+                patients.set(i, new Patient(patient.getName(), updatedAge, updatedDiagnosis));
+                found = true;
+                System.out.println("Patient information updated successfully!");
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("Patient not found with the given name.");
+        }
+    }
+
+    private void removePatient() {
+        System.out.println("Enter patient name to remove:");
+        String searchName = scanner.nextLine();
+
+        boolean removed = patients.removeIf(patient -> patient.getName().equalsIgnoreCase(searchName));
+
+        if (removed) {
+            System.out.println("Patient removed successfully!");
+            availableBeds++; // Increment available beds when a patient is removed
+        } else {
+            System.out.println("Patient not found with the given name.");
+        }
+    }
+
+    private void displayAvailableMedicines() {
+        System.out.println("Available Medicines:");
+        for (Map.Entry<String, String> entry : medicineMap.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+    }
+
+    private void addMedicine() {
+        System.out.println("Enter new medicine name:");
+        String medicineName = scanner.nextLine();
+
+        // Check if the medicine name already exists
+        if (medicineMap.containsKey(medicineName)) {
+            System.out.println("Medicine with the same name already exists. Enter a different name.");
+            return; // Return without adding the medicine
+        }
+
+        System.out.println("Enter suggested medicine for the disease:");
+        String suggestedMedicine = scanner.nextLine();
+
+        medicineMap.put(medicineName, suggestedMedicine);
+        System.out.println("Medicine added successfully!");
+    }
+
+    private boolean askYesNo() {
+        String response = scanner.nextLine().toLowerCase();
+        return response.equals("yes");
+    }
+
+    public static void main(String[] args) {
+        HospitalManagementSystem hospitalSystem = new HospitalManagementSystem();
+        hospitalSystem.managePatients();
+    }
+}
